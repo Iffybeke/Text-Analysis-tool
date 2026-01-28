@@ -2,7 +2,9 @@ from random_username.generate import generate_username
 import nltk
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem import WordNetLemmatizer
+from nltk.corpus import wordnet
 nltk.download('wordnet')
+nltk.download('averaged_perceptron_tagger_eng')
 wordLemmatizer = WordNetLemmatizer()
 import re
 
@@ -75,17 +77,33 @@ def getWordsPerSentence(sentences):
 		totalWords += len(sentence.split(" "))
 	return totalWords / len(sentences)
 
+# Convert part of speech from pos_tag() function
+# into wordnet compatible pos tag
+posToWordnetTag = {
+	"J": wordnet.ADJ,
+	"V": wordnet.VERB,
+	"N": wordnet.NOUN,
+	"R": wordnet.ADV
+}
+def treebankPosToWordnetPos(partOfSpeech):
+	posFirstChar = partOfSpeech[0]
+	if posFirstChar in posToWordnetTag:
+		return posToWordnetTag[posFirstChar]
+	return wordnet.NOUN
 
-# Filter raw tokenized words list to only include
-# valid english words
-def cleanseWordList(words):
+# Convert raw list of (word, POS) tuple to a list of strings
+# that only include valid english words
+def cleanseWordList(posTaggedWordTuples):
 	cleansedWords = []
 	invalidWordPattern = "[^a-zA-Z-+]"
-	for word in words:
+	for posTaggedWordTuple in posTaggedWordTuples:
+		word = posTaggedWordTuple[0]
+		pos = posTaggedWordTuple[1]
 		cleansedWord = word.replace(".", "").lower()
-		if (not re.search(invalidWordPattern, cleansedWord)) and len(word) > 1:
-			cleansedWords.append(wordLemmatizer.lemmatize(cleansedWord))
+		if (not re.search(invalidWordPattern, cleansedWord)) and len(cleansedWord) > 1:
+			cleansedWords.append(wordLemmatizer.lemmatize(cleansedWord, treebankPosToWordnetPos(pos)))
 	return cleansedWords
+
 
 
 # Get user info and greet
@@ -105,7 +123,8 @@ keySentences = extractKeySentences(articleSentences, stockSearchPattern)
 wordsPerSentence = getWordsPerSentence(articleSentences)
 
 # Get Word Analytics
-articleWordsCleansed = cleanseWordList(articleWords)
+wordsPosTagged = nltk.pos_tag(articleWords, lang='eng')
+articleWordsCleansed = cleanseWordList(wordsPosTagged)
 
 
 
