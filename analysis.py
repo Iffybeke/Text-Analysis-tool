@@ -4,6 +4,7 @@ import nltk
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet, stopwords
+from wordcloud import WordCloud
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('averaged_perceptron_tagger_eng')
@@ -128,9 +129,12 @@ wordsPerSentence = getWordsPerSentence(articleSentences)
 wordsPosTagged = nltk.pos_tag(articleWords, lang='eng')
 articleWordsCleansed = cleanseWordList(wordsPosTagged)
 
+# Generate word cloud
+separator = " "
+wordcloud = WordCloud(width = 1000, height = 700, \
+	background_color="beige", colormap="Set2", collocations=False).generate(separator.join(articleWordsCleansed))
+wordcloud.to_file("wordcloud.png")
 
+# Print for testing
+print("Done!")
 
-#print for testing
-articleTextRaw = getArticleText()
-print("GOT:")
-print(articleWordsCleansed)
