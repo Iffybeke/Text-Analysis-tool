@@ -5,7 +5,7 @@ def extractBasicStockInfo(data):
     for key in keysToExtract:
         if key in data:
             basicInfo[key] = data[key]
-   else:
+    else:
             basicInfo[key] = ""
    
     return basicInfo
