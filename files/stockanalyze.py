@@ -43,6 +43,9 @@ def getEarningsDates(company):
         print(allNewsArticles)
         return allNewsArticles
 
+        def extractCompanyNewsArticles(newsArticles):
+            print(newsArticles)
+
         def getCompanyStockInfo(tickerSymbol):
             #Get data from yahoo finance
             company = yf.Ticker(tickerSymbol)
